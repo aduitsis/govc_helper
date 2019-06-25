@@ -90,9 +90,14 @@ present_menu() {
 	shift
 	$DIRNAME/govc $@
 	LIST=$($DIRNAME/govc $@ | perl -nlE 'say "$_ $_"')
-	cmd="dialog --ascii-lines --menu \"please select $descr\" 0 0 0 $LIST 2>&1 >&$DIALOG_TERMINAL_PASSTHRU_FD"	
-	val=$(eval $cmd)
-	setvar $varname "$val"
+	if [ "$LIST" = "" ]; then
+		echo WARNING: govc $@ returned no results
+		setvar $varname ""
+	else
+		cmd="dialog --ascii-lines --menu \"please select $descr\" 0 0 0 $LIST 2>&1 >&$DIALOG_TERMINAL_PASSTHRU_FD"	
+		val=$(eval $cmd)
+		setvar $varname "$val"
+	fi
 }
 
 # invoke this function to be able to successfully authenticate to an esxi or vsphere server
